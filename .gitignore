@@ -1,0 +1,4 @@
+.env
+youtubeSecret.json
+*.mp4
+*.pyc

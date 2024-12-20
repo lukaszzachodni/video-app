@@ -1,0 +1,1752 @@
+
+schemas:
+  paths:
+    type: array
+  movie:
+    type: object
+    description: Object defining the movie to be rendered
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the movie if its available
+        default: true
+      comment:
+        type: string
+        description: Used for adding your comments
+      draft:
+        type: boolean
+        description: Set to true to add a watermark to the movie. Free plans are not allowed to set draft to false
+        enum:
+          - true
+          - false
+        default: true
+      elements:
+        type: array
+        description: Array of elements to be included in the movie
+        items:
+          anyOf:
+            - $ref: '#/components/schemas/video'
+            - $ref: '#/components/schemas/image'
+            - $ref: '#/components/schemas/text'
+            - $ref: '#/components/schemas/html'
+            - $ref: '#/components/schemas/component'
+            - $ref: '#/components/schemas/template'
+            - $ref: '#/components/schemas/audio'
+            - $ref: '#/components/schemas/voice'
+            - $ref: '#/components/schemas/audiogram'
+            - $ref: '#/components/schemas/subtitles'
+      exports:
+        type: array
+        description: You can define different types of exports for your movie. Check the documentation for more information
+        items:
+          type: object
+      height:
+        type: integer
+        description: Height of the movie. Only applicable if resolution is set to 'custom'
+        default: 360
+        minimum: 50
+        maximum: 3840
+        example: 360
+      id:
+        type: string
+        description: Movie ID string. It must be unique per project
+        default: '@randomString'
+      quality:
+        type: string
+        description: Quality of the final rendered movie. Use it for speeding up the rendering process. 'low' is the lowest quality, 'high' is the highest quality
+        enum:
+          - low
+          - medium
+          - high
+        default: high
+      resolution:
+        type: string
+        description: Set the movie size based on common use cases. Use 'custom' to set a custom size with the 'width' and 'height' properties
+        enum:
+          - sd
+          - hd
+          - full-hd
+          - squared
+          - instagram-story
+          - instagram-feed
+          - twitter-landscape
+          - twitter-portrait
+          - custom
+        default: custom
+      scenes:
+        type: array
+        description: Array of scenes to be included in the movie
+        items:
+          $ref: '#/components/schemas/scene'
+        required: true
+      variables:
+        type: object
+        description: Variables of the template. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      width:
+        type: integer
+        description: Width of the movie. Only applicable if resolution is set to 'custom'
+        default: 640
+        minimum: 50
+        maximum: 3840
+        example: 640
+
+  scene:
+    type: object
+    properties:
+      'background-color':
+        type: string
+        description: A hexadecimal representation of a color or 'transparent'
+        default: '#000000'
+        example: '#FF0000'
+      cache:
+        type: boolean
+        description: Use the cached version of the scene if its available
+        default: true
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the scene to be rendered. If the value is false or empty string, the scene is removed from the movie
+      duration:
+        type: number
+        format: float
+        description: Sets the scene duration in seconds. A value of -1 means that the scene lasts enough to contain all its elements
+        default: -1
+      elements:
+        type: array
+        description: Array of elements to be included in the scene
+        items:
+          anyOf:
+            - $ref: '#/components/schemas/video'
+            - $ref: '#/components/schemas/image'
+            - $ref: '#/components/schemas/text'
+            - $ref: '#/components/schemas/html'
+            - $ref: '#/components/schemas/component'
+            - $ref: '#/components/schemas/audio'
+            - $ref: '#/components/schemas/voice'
+            - $ref: '#/components/schemas/audiogram'
+            - $ref: '#/components/schemas/subtitles'
+      id:
+        type: string
+        description: ID of the scene
+        default: '@randomString'
+      transition:
+        type: object
+        properties:
+          duration:
+            type: number
+            format: float
+            description: Duration of the transition in seconds
+            example: 1.5
+          style:
+            type: string
+            description: Style of the transition
+            enum:
+              - fade
+              - wipeleft
+              - wiperight
+              - wipeup
+              - wipedown
+              - slideleft
+              - slideright
+              - slideup
+              - slidedown
+              - circlecrop
+              - rectcrop
+              - distance
+              - fadeblack
+              - fadewhite
+              - radial
+              - smoothleft
+              - smoothright
+              - smoothup
+              - smoothdown
+              - circleopen
+              - circleclose
+              - vertopen
+              - vertclose
+              - horzopen
+              - horzclose
+              - dissolve
+              - pixelize
+              - diagtl
+              - diagtr
+              - diagbl
+              - diagbr
+              - hlslice
+              - hrslice
+              - vuslice
+              - vdslice
+              - hblur
+              - fadegrays
+              - wipetl
+              - wipetr
+              - wipebl
+              - wipebr
+              - squeezeh
+              - squeezev
+            default: fade
+            example: circleopen
+          type:
+            type: string
+            enum:
+              - xfade
+            default: xfade
+      variables:
+        type: object
+        description: Local variables of the scene. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+  video:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -1
+        example: 7.3
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      loop:
+        type: integer
+        description: Sets the number of loops the video to play. Use -1 for an infinite loop. The default value of 1 plays the video just once.
+        minimum: -1
+        example: -1
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      muted:
+        type: boolean
+        description: Mutes the audio
+        default: false
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      seek:
+        type: number
+        format: float
+        description: Seek to the specified time in seconds relative to the begining of the asset. Use negative values to seek backwards
+        default: 0
+      src:
+        type: string
+        format: uri
+        description: URL to the asset file. Videos can be in MP4, MKV, MOV but MP4 is recommended.
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      type:
+        type: string
+        enum:
+          - video
+        required: true
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      volume:
+        type: number
+        description: Volume gain of the audio. A value of 1 means no gain. Higher values increase the volume. Values lower than 1 decrease the volume
+        default: 1
+        minimum: 0
+        maximum: 10
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  image:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -1
+        example: 7.3
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      src:
+        type: string
+        format: uri
+        description: URL to the asset file. Images can be in JPG, PNG, GIF or any common image format.
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      type:
+        type: string
+        enum:
+          - image
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  text:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -2
+        minimum: -2
+        example: -1
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      settings:
+        type: object
+        description: Text formatting settings. In general, these are CSS properties such as 'font-size', 'colour' or 'font-weight'. See the styles to confirm which properties are available.
+        default: {}
+        example:
+          'font-size': '60px'
+          color: '#FF0000'
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      style:
+        type: string
+        description: Style of the text element. Check all available text style at https://json2video.com/resources/text/
+        default: '001'
+        example: '003'
+      text:
+        type: string
+        description: Text to be printed. The text string does not accept HTML formatting.
+        example: Lorem ipsum dolor sit amet
+        required: true
+      type:
+        type: string
+        enum:
+          - text
+        required: true
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  html:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -2
+        minimum: -2
+        example: -1
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      html:
+        type: string
+        description: HTML snippet to render. Compatible with HTML5, CSS3 and Javascript
+        example: <h1>Hello world</h1>
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      src:
+        type: string
+        description: URL to the web page
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      tailwindcss:
+        type: boolean
+        description: Enables usage of TailwindCSS for the HTML snippet
+        default: false
+        example: true
+      type:
+        type: string
+        enum:
+          - html
+        required: true
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      wait:
+        type: number
+        description: Time in seconds to wait before taking the screenshot
+        default: 2
+        minimum: 0
+        maximum: 5
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  component:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      component:
+        type: string
+        description: ID of the Component element. Check all available components in the library
+        example: basic/001
+        required: true
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -2
+        minimum: -2
+        example: -1
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      settings:
+        type: object
+        description: Settings to be passed to the component
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      type:
+        type: string
+        enum:
+          - component
+        required: true
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  template:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      'chroma-key':
+        type: object
+        description: Allows to define a color (or a range of colors) that will be converted to transparent
+        properties:
+          color:
+            type: string
+            description: Set the color for which alpha will be set to 0 (full transparency)
+            example: '#00b140'
+            required: true
+          tolerance:
+            type: integer
+            description: Makes the selection more or less sensitive to changes in color. A value of 1 will select only the provided color. A value of 100 will select all colors, so the full canvas
+            default: 25
+            minimum: 1
+            maximum: 100
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      correction:
+        type: object
+        description: Allows to adjust the contrast, brightness, saturation and gamma of the element
+        properties:
+          brightness:
+            type: number
+            description: Adjust the brightness
+            default: 0
+            minimum: -1
+            maximum: 1
+          contrast:
+            type: number
+            description: Adjust the contrast
+            default: 1
+            minimum: -1000
+            maximum: 1000
+          gamma:
+            type: number
+            description: Adjust the gamma
+            default: 1
+            minimum: 0.1
+            maximum: 10
+          saturation:
+            type: number
+            description: Adjust the saturation
+            default: 1
+            minimum: 0
+            maximum: 3
+      crop:
+        type: object
+        description: Crops the element
+        properties:
+          height:
+            type: integer
+            description: Sets the height of the croping
+            required: true
+          width:
+            type: integer
+            description: Sets the width of the croping
+            required: true
+          x:
+            type: integer
+            description: Sets the left point of croping
+            default: 0
+          y:
+            type: integer
+            description: Sets the top point of croping
+            default: 0
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -2
+        minimum: -2
+        example: -1
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      'flip-horizontal':
+        type: boolean
+        description: Flips the element horizontally
+        default: false
+      'flip-vertical':
+        type: boolean
+        description: Flips the element vertically
+        default: false
+      height:
+        type: integer
+        description: Sets the height of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      mask:
+        type: string
+        description: URL to a PNG or video file defining a mask for the element. Black color is transparent, white is solid, and colors in between are partially transparent
+      pan:
+        type: string
+        description: Pans the element to the specified direction. If 'zoom' property is not specified, the effect is a non-zooming pan
+        enum:
+          - left
+          - top
+          - right
+          - bottom
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-left'
+          - 'bottom-right'
+      'pan-crop':
+        type: boolean
+        description: Enable or disable the crop effect when panning
+        default: true
+      'pan-distance':
+        type: number
+        format: float
+        description: Pans the element to the specified distance
+        default: 0.1
+        minimum: 0.01
+        maximum: 0.5
+      position:
+        type: string
+        description: Sets the element position in the scene. A value of 'custom' sets a custom position based on the provided 'x' and 'y' properties
+        enum:
+          - 'top-left'
+          - 'top-right'
+          - 'bottom-right'
+          - 'bottom-left'
+          - 'center-center'
+          - custom
+        default: custom
+      rotate:
+        type: object
+        properties:
+          angle:
+            type: number
+            description: Sets the angle of rotation
+            default: 0
+            minimum: -360
+            maximum: 360
+            required: true
+          speed:
+            type: number
+            description: Sets the time it takes to rotate the provided angle. A zero value means no movement
+            default: 0
+            minimum: 0
+      scale:
+        type: object
+        description: This property is deprecated. Use 'width' and 'height' instead
+        properties:
+          height:
+            type: integer
+            description: Sets the height for scaling the element
+            default: -1
+            minimum: -1
+          width:
+            type: integer
+            description: Sets the width for scaling the element
+            default: -1
+            minimum: -1
+      settings:
+        type: object
+        description: Settings to be passed to the template
+      src:
+        type: string
+        description: Template ID or a full template object
+        required: true
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      type:
+        type: string
+        enum:
+          - template
+        required: true
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      width:
+        type: integer
+        description: Sets the width of the element, scaling up or down if required. A value of '-1' means to keep the aspect ratio
+        default: -1
+        minimum: -1
+      x:
+        type: number
+        format: integer
+        description: Sets the horizontal position of the element in the scene. The value '0' is on the left side
+        default: 0
+      y:
+        type: number
+        format: integer
+        description: Sets the vertical position of the element in the scene. The value '0' is on the top side
+        default: 0
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
+      zoom:
+        type: integer
+        description: Zooms the element with the specified level percentage. Positive values zoom in, negative values zoom out, zero does not zoom. Zoom can be combined with the 'pan' property to set the focus point of the zooming
+        minimum: -100
+        maximum: 100
+
+  audio:
+    type: object
+    properties:
+      cache:
+        type: boolean
+        description: Use the cached version of the element if its available
+        default: true
+        example: false
+      comment:
+        type: string
+        description: Used for adding your comments
+      condition:
+        type: string
+        description: OPTIONAL. Condition to be met for the element to be rendered. If the value is false or empty string, the element is removed from the scene
+      duration:
+        type: number
+        format: float
+        description: Element's duration in seconds. A value of -1 auto calculates the duration based on the asset/file intrinsic length. A value of -2 sets the element duration to the parent scene or element duration
+        default: -1
+        example: 7.3
+      'extra-time':
+        type: number
+        format: float
+        description: Element's time span added after the playback.
+        default: 0
+        example: 0.5
+      'fade-in':
+        type: number
+        format: float
+        description: Adds a fade in effect to the element. Value in seconds.
+        minimum: 0
+      'fade-out':
+        type: number
+        format: float
+        description: Adds a fade out effect to the element. Value in seconds.
+        minimum: 0
+      id:
+        type: string
+        description: ID of the element
+        default: '@randomString'
+      loop:
+        type: integer
+        description: Sets the number of loops the video to play. Use -1 for an infinite loop. The default value of 1 plays the video just once.
+        minimum: -1
+        example: -1
+      muted:
+        type: boolean
+        description: Mutes the audio
+        default: false
+      seek:
+        type: number
+        format: float
+        description: Seek to the specified time in seconds relative to the begining of the asset. Use negative values to seek backwards
+        default: 0
+      src:
+        type: string
+        format: uri
+        description: URL to the asset file. Audios can be in MP3, WAV or any common audio format.
+      start:
+        type: number
+        format: float
+        description: Element's starting time in seconds relative to the container scene or the movie if the element is in the Movie's elements array.
+        default: 0
+      type:
+        type: string
+        enum:
+          - audio
+      variables:
+        type: object
+        description: Local variables of the element. Variable names can only contain letters, numbers and underscores
+        default: {}
+        example:
+          myVariable: myValue
+          myOtherVariable: true
+          myThirdVariable: 123
+      volume:
+        type: number
+        description: Volume gain of the audio. A value of 1 means no gain. Higher values increase the volume. Values lower than 1 decrease the volume
+        default: 1
+        minimum: 0
+        maximum: 10
+      'z-index':
+        type: number
+        format: integer
+        description: Element's z-index. Use this property to reorganize the layering of the elements like in HTML
+        default: 0
+        minimum: -99
+        maximum: 99
+        example: 3
