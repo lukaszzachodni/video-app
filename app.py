@@ -53,32 +53,32 @@ load_dotenv()
 JSON2VIDEO_API_KEY = os.getenv("JSON2VIDEO_API_KEY")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-gemini = GeminiApi(GEMINI_API_KEY)
-taskName = "Jesteś kreatywnym asystentem AI, który pomaga w tworzeniu filmów."
-task1 = {
-    "task": taskName,
-    "step": {
-        "id": "topic and key words",
-        "description": "Wymyśl temat krótkiego filmu (60 sekund) i wypisz listę słów kluczowych do przeszukania stocka Pexels. Film powinien być interesujący i angażujący, odpowiedni do wizualnej prezentacji i łatwy do zilustrowania. Słowa kluczowe powinny być zróżnicowane i odzwierciedlać różne aspekty tematu.",
-    },
-    "response_in_JSON_schema": {
-        "topic": "[topic]",
-        "picures_key_words": "word1 word2 word3",
-        "movies_key_words": "word1 word2 word3",
-    },
-}
-
-data1 = gemini.send_prompt(prompt=str(task1))
-
-moveScenario = {"topic": data1["topic"], "pictures": [], "movies": []}
+json2VideoClient = Json2VideoClient(JSON2VIDEO_API_KEY)
 stockMedia = PexelsStockMedia(PEXELS_API_KEY)
-# print(stockMedia.get_remaining_requests())
+gemini = GeminiApi(GEMINI_API_KEY)
+# taskName = "Jesteś kreatywnym asystentem AI, który pomaga w tworzeniu filmów."
+# task1 = {
+#     "task": taskName,
+#     "step": {
+#         "id": "topic and key words",
+#         "description": "Wymyśl temat krótkiego filmu (60 sekund) i wypisz listę słów kluczowych do przeszukania stocka Pexels. Film powinien być interesujący i angażujący, odpowiedni do wizualnej prezentacji i łatwy do zilustrowania. Słowa kluczowe powinny być zróżnicowane i odzwierciedlać różne aspekty tematu. W odpowiedzi zwróc tylko JSONa wg schemy podanej poniżej.",
+#     },
+#     "response_in_JSON_schema": {
+#         "topic": "[topic]",
+#         "picures_key_words": "word1 word2 word3",
+#         "movies_key_words": "word1 word2 word3",
+#     },
+# }
+
+# data1 = gemini.send_prompt(prompt=str(task1))
+
+# movieScenario = {"topic": data1["topic"], "images": [], "videos": [], "audios": []}
+# # print(stockMedia.get_remaining_requests())
 
 # photos = stockMedia.search_photos(data1["picures_key_words"], per_page=10)
 
 # for _photo in photos.photos:
-#     moveScenario["pictures"].append(
+#     movieScenario["images"].append(
 #         {
 #             "url": _photo.src.original,
 #             "alt": _photo.alt,
@@ -87,62 +87,53 @@ stockMedia = PexelsStockMedia(PEXELS_API_KEY)
 #             "avg_color": _photo.avg_color,
 #         }
 #     )
-task_describe_pexels_video = {
-    "task": taskName,
-    "step": {
-        "id": "Describe video",
-        "description": "Describe the content and style of the video, what is happening, camera positon and movement.",
-    },
-    "response_schema": {"description": "[video description]"},
-}
+# task_describe_pexels_video = {
+#     "task": taskName,
+#     "step": {
+#         "id": "Describe video",
+#         "description": "Describe the content and style of the video, what is happening, camera positon and movement. W odpowiedzi zwróc tylko JSONa wg schemy podanej poniżej.",
+#     },
+#     "response_in_JSON_schema": {
+#         "description": "[video description]",
+#         "gemini_comment": "[comment from AI]",
+#     },
+# }
 
 
-videos = stockMedia.search_videos(data1["movies_key_words"], per_page=1)
-for _video in videos.videos:
-    video_path = _video.video_files[0].link.split("/")[-1]
-    with open(video_path, "wb") as f:
-        f.write(requests.get(_video.video_files[0].link).content)
-    video_file = gemini.send_file(GEMINI_API_KEY, video_path)
-    data_video_description = gemini.send_prompt(
-        [video_file, task_describe_pexels_video]
-    )
-    moveScenario["movies"].append(
-        {
-            "url": _video.video_files[0].link,
-            "width": _video.width,
-            "height": _video.height,
-            "moviesDescritpion": data_video_description["description"],
-        }
-    )
+# videos = stockMedia.search_videos(data1["movies_key_words"], per_page=10)
+# for _video in videos.videos:
+#     video_path = _video.video_files[0].link.split("/")[-1]
+#     with open(video_path, "wb") as f:
+#         f.write(requests.get(_video.video_files[0].link).content)
+#     video_file = gemini.send_file(GEMINI_API_KEY, video_path)
+
+#     movieScenario["videos"].append(
+#         {"name": video_file.name, "url": _video.video_files[0].link}
+#     )
 
 
-print(moveScenario)
-exit()
+# task3 = {
+#     "task": taskName,
+#     "step": {
+#         "id": "Create JSON for json2video API",
+#         "description": f"Przeanalizuj materiały i scenariusz filmu z pola movieScenario. Zwróć uwagę na pozycje kamery i kadr, ruch, wydarzenia etc. Wykorzystaj typy z odpowiednich kluczy, images -> image, pictures -> picture, audios -> audio. Jeśli nie ma jakiegoś zasobu to go nie uzywaj przy montażu.   W odpowiedzi zwróc tylko JSONa wg schemy podanej poniżej.",
+#     },
+#     "movieScenario": movieScenario,
+#     "film_duartion_in_seconds": 60,
+#     "schema_to_generate_JSON": yaml_do_json("src\Json2VideoSDK\schema.yaml"),
+#     "response_in_JSON_schema": {
+#         "schemaVideo": "[generated json]",
+#         "comments": "comment from AI",
+#     },
+# }
+# data3 = gemini.send_prompt(prompt=str(task3))
+# if "movie" in data3["schemaVideo"]:
+#     movieScenario["schemaVideo"] = data3["schemaVideo"]["movie"]
+# else:
+#     movieScenario["schemaVideo"] = data3["schemaVideo"]
+# movieScenario["comments"] = data3["comments"]
+# print(movieScenario)
 
 
-task3 = {
-    "task": taskName,
-    "step": {
-        "id": "Create JSON for json2video API",
-        "description": f"Użyj materiałów i opisów ze źródel do stworzenia scenariusza filmu o temacie {moveScenario['topic']}. Pamiętaj aby podać rozmiar dla każdego elementu zgodny z rozmiarem tworzonego filmu, ale nie rozciągaj zdjęć, jeśli trzeba to zrób zooma albo cropa. Przy każdym wykorzystanym źródle dodaj jego alt do danej sceny jako tekst.",
-    },
-    "sources": {"pictures": moveScenario["pictures"], "movies": moveScenario["movies"]},
-    "film_duartion_in_seconds": 60,
-    "schema_to_generate_JSON": yaml_do_json("src\Json2VideoSDK\schema.yaml"),
-    "response_schema": {
-        "schemaVideo": "[generated json]",
-        "comments": "comment from AI",
-    },
-}
-data3 = gemini.send_prompt(prompt=str(task3))
-if "movie" in data3["schemaVideo"]:
-    moveScenario["schemaVideo"] = data3["schemaVideo"]["movie"]
-else:
-    moveScenario["schemaVideo"] = data3["schemaVideo"]
-moveScenario["comments"] = data3["comments"]
-print(moveScenario)
-json2VideoClient = Json2VideoClient(JSON2VIDEO_API_KEY)
-
-
-print(json2VideoClient.create_movie(movie=moveScenario["schemaVideo"]))
-print(json2VideoClient.get_movies("FQUK9UDCvDttgkQo"))
+# print(json2VideoClient.create_movie(movie=movieScenario["schemaVideo"]))
+print(json2VideoClient.get_movies("FXw3HCPDCIetyxlX"))

@@ -15,8 +15,6 @@ class GeminiApi:
         return json.loads(response.replace("`", "").replace("json", ""))
 
     def send_file(self, api_key, file_path: str) -> str:
-        genai.configure(api_key=api_key)
-
         video_file = genai.upload_file(path=file_path)
         while video_file.state.name == "PROCESSING":
             print(".", end="")
@@ -24,5 +22,5 @@ class GeminiApi:
             video_file = genai.get_file(video_file.name)
         if video_file.state.name == "FAILED":
             raise ValueError(video_file.state.name)
-        print(video_file)
+        # print(video_file)
         return video_file
