@@ -72,7 +72,16 @@ gemini = GeminiApi(GEMINI_API_KEY)
 
 # data1 = gemini.send_prompt(prompt=str(task1))
 
-# movieScenario = {"topic": data1["topic"], "images": [], "videos": [], "audios": []}
+movieScenario = {
+    "topic": data1["topic"] if data1 and "topic" in data1 else "",
+    "images": [],
+    "videos": [],
+    "audios": [],
+    "film_duartion_in_seconds": 60,
+    "voiceText": [],
+    "displayText": [],
+}
+print(movieScenario)
 # # print(stockMedia.get_remaining_requests())
 
 # photos = stockMedia.search_photos(data1["picures_key_words"], per_page=10)
@@ -119,7 +128,7 @@ gemini = GeminiApi(GEMINI_API_KEY)
 #         "description": f"Przeanalizuj materiały i scenariusz filmu z pola movieScenario. Zwróć uwagę na pozycje kamery i kadr, ruch, wydarzenia etc. Wykorzystaj typy z odpowiednich kluczy, images -> image, pictures -> picture, audios -> audio. Jeśli nie ma jakiegoś zasobu to go nie uzywaj przy montażu.   W odpowiedzi zwróc tylko JSONa wg schemy podanej poniżej.",
 #     },
 #     "movieScenario": movieScenario,
-#     "film_duartion_in_seconds": 60,
+#
 #     "schema_to_generate_JSON": yaml_do_json("src\Json2VideoSDK\schema.yaml"),
 #     "response_in_JSON_schema": {
 #         "schemaVideo": "[generated json]",
